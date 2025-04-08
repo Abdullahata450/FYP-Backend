@@ -1,3 +1,5 @@
+import User from "../models/user.model.js";
+
 
 import axios from "axios";
 
@@ -9,6 +11,20 @@ export const homePage1 = (req, res) => {
     res.send("Hello World2! How are you?");
 };
 
+export const getAllUser = async(req,res)    => {   
+    try {
+        const user = await User.find({},'clerkUserId firstName lastName email'); // Fetch all users with specific fields
+        if (!user) {
+            return res.status(404).json({ success: false, message: "No users found" });
+        }
+        return res.status(200).json({ success: true, data: user }); // Send user data as response
+        
+    } catch (error) {
+        console.error("Error fetching users:", error.message);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+        
+    }
+ }
 
 export const companyNews = async (req, res) => {
     try {
