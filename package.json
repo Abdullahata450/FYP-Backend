@@ -14,11 +14,13 @@
   "author": "Abdullah bin ata",
   "license": "ISC",
   "dependencies": {
+    "@api/testalpacadocs": "file:.api/apis/testalpacadocs",
     "axios": "^1.8.2",
     "backend": "file:",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "micro": "^10.0.1",
     "mongoose": "^8.12.1",
     "svix": "^1.61.3"
   },

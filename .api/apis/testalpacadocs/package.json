@@ -1,0 +1,12 @@
+{
+  "name": "@api/testalpacadocs",
+  "version": "2.0.1",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "dependencies": {
+    "@api/testalpacadocs": "file:",
+    "api": "^6.1.3",
+    "json-schema-to-ts": "^2.8.0-beta.0",
+    "oas": "^26.0.4"
+  }
+}

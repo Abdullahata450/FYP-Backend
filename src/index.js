@@ -18,6 +18,9 @@ app.use(cors({
 const port = process.env.PORT || 7000;
 
 app.use(bodyParser.raw({ type: "application/json" })); // Use bodyParser only once
+// here i am using bodyParser to parse the raw body of the request
+// so that i can use it in the webhook verification process
+// In controller api code first convert req.body to string due ti is in raw format where i need data in json() key value pair format
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
@@ -103,4 +106,3 @@ app.post("/api/webhooks", async (req, res) => {
 });
 
 // app.use("/", homeroute);
-
