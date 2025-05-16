@@ -15,14 +15,17 @@
   "license": "ISC",
   "dependencies": {
     "@api/testalpacadocs": "file:.api/apis/testalpacadocs",
-    "axios": "^1.8.2",
+    "axios": "^1.9.0",
     "backend": "file:",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "micro": "^10.0.1",
     "mongoose": "^8.12.1",
-    "svix": "^1.61.3"
+    "python-shell": "^5.0.0",
+    "svix": "^1.61.3",
+    "yahoo-finance2": "^2.13.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

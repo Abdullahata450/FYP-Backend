@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 import axios from "axios";
-import express from "express";
+import express, { application } from "express";
 
 
 export const homePage = (req, res) => {
@@ -102,6 +102,168 @@ export const getAlpacaStockPrice = async (req,res) => {
             res.status(500).json({ error: 'Failed to fetch stock price' });
       }
 }
+
+
+export const PlaceOrder = async(req, res )=>{
+    try{
+        const rawBody = req.body.toString('utf8');
+        const body = JSON.parse(rawBody);
+        //
+        const apikey = body.apikey || body.apiKey;
+        const secretKey = body.secretKey || body.secretkey;
+        const symbol = body.symbol;
+        const qty = body.qty;
+        const side = body.side;
+        const type = body.type;
+        const time_in_force = body.time_in_force;
+        
+
+        if(!apikey || !secretKey || !symbol || !qty || !side || !type || !time_in_force) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+        const response = await axios.post(
+            'https://paper-api.alpaca.markets/v2/orders',
+            {
+                    symbol,
+                    qty,
+                    side,
+                    type,
+                    time_in_force 
+            },
+            {
+                headers: {
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                    'APCA-API-KEY-ID': apikey,
+                    'APCA-API-SECRET-KEY': secretKey
+                }
+            }
+        )
+        return res.status(200).json({
+            status: 'OK',
+            order: response.data
+        }); 
+
+    }
+    catch(error){
+        
+        console.error("Error placing order:", error.response?.data || error.message);
+        return res.status(error.response?.status || 500).json({
+            success: false,
+            message: error.response?.data?.message || "Failed to place order",
+            details: error.response?.data || error.message
+        });
+    }
+}
+
+export const getAllOrders = async (req, res) => {
+    try {
+        const rawBody = req.body.toString('utf8');
+        const body = JSON.parse(rawBody);
+
+        const apikey = body.apikey || body.apiKey;
+        const secretKey = body.secretKey || body.secretkey;
+
+        if (!apikey || !secretKey) {
+            return res.status(400).json({ error: 'API key and secret key are required' });
+        }
+
+        const response = await axios.get("https://paper-api.alpaca.markets/v2/orders?status=all",{
+            headers: {
+                'accept': 'application/json',
+                'APCA-API-KEY-ID': apikey,
+                'APCA-API-SECRET-KEY': secretKey
+            }
+        });
+
+        res.status(200).json({
+            status: 'OK',
+            orders: response.data
+        });
+        
+    } catch (error) {
+        res.status(error.response?.status || 500).json({
+            success: false,
+            message: error.response?.data?.message || "Failed to fetch orders Data",
+            details: error.message
+        }); 
+    }
+}
+
+
+export const getStockPosition = async (req, res) => {
+    try {
+        const rawBody = req.body.toString('utf8');
+        const body = JSON.parse(rawBody);
+
+        const apikey = body.apikey || body.apiKey;
+        const secretKey = body.secretKey || body.secretkey;
+
+        if(!apikey || !secretKey) {
+            return res.status(400).json({ error: 'API key and secret key are required' });
+        }
+        const response = await axios.get('https://paper-api.alpaca.markets/v2/positions',{
+            headers:{
+                'accept': 'application/json',
+                'APCA-API-KEY-ID': apikey,
+                'APCA-API-SECRET-KEY': secretKey
+            }
+        })
+       
+        res.status(200).json(response.data);
+
+    } catch (error) {
+        console.error('Error fetching Alpaca positions:', error.message);
+        res.status(500).json({ error: 'Failed to fetch positions' });   
+    }
+}
+
+import yahooFinance from 'yahoo-finance2';
+import dayjs from 'dayjs';
+
+export const getStockData = async (req, res) => {
+  try {
+    const rawBody = req.body.toString('utf8');
+    const body = JSON.parse(rawBody);
+    const symbol = body.symbol || body.symbolName; // Use symbolName if provided
+    if (!symbol) {
+      return res.status(400).json({ error: 'Stock symbol is required.' });
+    }
+
+    // Get today's date and yesterday's date
+    const today = dayjs().format('YYYY-MM-DD');
+    const yesterday = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
+
+    // Get live quote
+    const quote = await yahooFinance.quote(symbol); // live data
+
+    // Get historical data for yesterday and today
+    const history = await yahooFinance.historical(symbol, {
+      period1: yesterday,
+      period2: today,
+      interval: '1d',
+    });
+
+    res.status(200).json({
+      symbol,
+      live: {
+        price: quote.regularMarketPrice,
+        open: quote.regularMarketOpen,
+        high: quote.regularMarketDayHigh,
+        low: quote.regularMarketDayLow,
+        volume: quote.regularMarketVolume,
+      },
+      historical: history,
+    });
+  } catch (error) {
+    console.error('Yahoo Finance fetch failed:', error);
+    res.status(500).json({ error: 'Failed to fetch Yahoo Finance data', message: error.message });
+  }
+};
+
+
+
+
 
 export const getStockNews = async (req, res) => {
     try {
